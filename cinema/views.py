@@ -2,14 +2,11 @@ from datetime import datetime
 from django.db.models import F, Count
 from django.http import Http404
 from rest_framework import viewsets, mixins
-from rest_framework.permissions import (
-    IsAuthenticated,
-    SAFE_METHODS,
-    BasePermission,
-)
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.pagination import PageNumberPagination
 
 from cinema.models import Genre, Actor, CinemaHall, Movie, MovieSession, Order
+from cinema.permissions import IsAdminOrIfAuthenticatedReadOnly
 from cinema.serializers import (
     GenreSerializer,
     ActorSerializer,
@@ -23,17 +20,6 @@ from cinema.serializers import (
     OrderSerializer,
     OrderListSerializer,
 )
-
-
-class IsAdminOrIfAuthenticatedReadOnly(BasePermission):
-    def has_permission(self, request, view):
-        if request.method in SAFE_METHODS:
-            return bool(request.user and request.user.is_authenticated)
-        return bool(
-            request.user
-            and request.user.is_authenticated
-            and request.user.is_staff
-        )
 
 
 class OrderPagination(PageNumberPagination):
